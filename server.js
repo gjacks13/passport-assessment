@@ -1,19 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const apiRoutes = require('./routes/index');
 
 // load envrionment and config
 const env = process.env.NODE_ENV || 'development';
 const config = require('./config/config.js');
 
 // load config variables
-const { mongoURI, PORT } = config[env];
+const { MONGO_URI, PORT } = config[env];
 
 const app = express();
 
 // connect to mongo database
-mongoose.connect(mongoURI)
-  .then(() => console.log('Connection successful'))
+mongoose.connect(MONGO_URI)
   .catch(err => console.log(err));
 
 // configure body parser
@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 app.use(express.static('client/build'));
 
 // load routes
-require('./routes/api-routes.js')(app);
+app.use(apiRoutes);
 
 // start server
 app.listen(PORT, () => {
