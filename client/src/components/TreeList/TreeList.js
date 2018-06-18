@@ -5,7 +5,7 @@ class TreeList extends React.Component {
   render() {
     return (
       <ul class="tree-list">
-        <div>
+        <div className="container-name">
           <span>
             {this.props.treeName}
           </span>

@@ -77,6 +77,8 @@ class App extends Component {
               <FactoryNode
                 branchId={branch._id}
                 branchName={branch.name}
+                minChildValue={branch.minChildValue}
+                maxChildValue={branch.maxChildValue}
               >
                 {
                   branch.children ? branch.children.map((branchChild) => (
