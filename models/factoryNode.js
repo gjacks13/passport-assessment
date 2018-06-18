@@ -19,13 +19,15 @@ const factoryNodeSchema = new Schema({
   },
   minChildValue: {
     type: Number,
-    required: true,
     default: 1,
   },
   maxChildValue: {
     type: Number,
-    required: true,
     default: 25,
+  },
+  containerId: {
+    type: Schema.Types.ObjectId,
+    required: true,
   },
 });
 

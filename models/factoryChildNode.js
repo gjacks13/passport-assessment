@@ -17,6 +17,14 @@ const factoryChildeNodeSchema = new Schema({
     type: Number,
     default: 25,
   },
+  value: {
+    type: Number,
+    required: true,
+  },
+  factoryId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+  },
 });
 
 const FactoryChildNode = mongoose.model('FactoryChildNode', factoryChildeNodeSchema);

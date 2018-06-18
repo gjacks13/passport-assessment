@@ -10,6 +10,13 @@ module.exports = {
      * */
     const filter = {};
     FactoryNode.find(filter)
+      .populate({
+        path: 'children',
+        populate: {
+          path: 'children',
+          model: 'FactoryChildNode',
+        },
+      })
       .then((dbFactoryNodes) => {
         res.json(dbFactoryNodes);
       })
@@ -24,6 +31,13 @@ module.exports = {
     }
 
     FactoryNode.findOne(filter)
+      .populate({
+        path: 'children',
+        populate: {
+          path: 'children',
+          model: 'FactoryChildNode',
+        },
+      })
       .then((dbFactoryNode) => {
         res.json(dbFactoryNode);
       })
@@ -60,6 +74,7 @@ module.exports = {
         },
       })
       .then((dbFactoryNode) => {
+        req.app.io.emit('update factory', dbFactoryNode);
         res.json(dbFactoryNode);
       })
       .catch(err => res.json(err));
@@ -80,6 +95,10 @@ module.exports = {
     if (children) request.children = children;
     if (minChildValue) request.minChildValue = minChildValue;
     if (maxChildValue) request.maxChildValue = maxChildValue;
+    if (!containerId) {
+      res.status(500).json('No factory id present');
+    }
+    request.containerId = containerId;
 
     const newFactory = new FactoryNode(request);
     FactoryNode.create(newFactory)
@@ -93,6 +112,7 @@ module.exports = {
           { new: true },
         )
           .then(() => {
+            req.app.io.emit('add factory', dbFactoryNode);
             res.json(dbFactoryNode);
           })
           .catch(err => res.json(err));
@@ -115,6 +135,7 @@ module.exports = {
           })
             .catch(err => res.json(err));
         });
+        req.app.io.emit('delete factory', dbFactoryNode);
         res.json(dbFactoryNode);
       })
       .catch(err => res.json(err));

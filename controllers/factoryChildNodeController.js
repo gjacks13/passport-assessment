@@ -36,6 +36,7 @@ module.exports = {
       name,
       minValue,
       maxValue,
+      value,
     } = req.body;
 
     // setup filter by id
@@ -47,9 +48,11 @@ module.exports = {
     if (name) request.name = name;
     if (minValue) request.minValue = minValue;
     if (maxValue) request.maxValue = maxValue;
+    if (value) request.value = value;
 
     FactoryChildNode.findOneAndUpdate(filter, request, { new: true })
       .then((dbFactoryChildNode) => {
+        req.app.io.emit('update node', dbFactoryChildNode);
         res.json(dbFactoryChildNode);
       })
       .catch(err => res.json(err));
@@ -61,6 +64,7 @@ module.exports = {
       name,
       minChildValue,
       maxChildValue,
+      value,
     } = req.body;
 
     const { factoryId } = req.params;
@@ -69,6 +73,15 @@ module.exports = {
     if (name) request.name = name;
     if (minChildValue) request.minChildValue = minChildValue;
     if (maxChildValue) request.maxChildValue = maxChildValue;
+    if (!value) {
+      res.status(500).json('No value specified.');  
+    }
+    request.value = value;
+
+    if (!factoryId) {
+      res.status(500).json('No factory id present');
+    }
+    request.factoryId = factoryId;
 
     FactoryNode.findOne({ _id: factoryId })
       .then((dbFactory) => {
@@ -86,6 +99,7 @@ module.exports = {
                 { new: true },
               )
                 .then(() => {
+                  req.app.io.emit('add node', dbFactoryChildNode);
                   res.json(dbFactoryChildNode);
                 })
                 .catch(err => res.json(err));
@@ -105,6 +119,7 @@ module.exports = {
     };
     FactoryChildNode.findOneAndRemove(filter)
       .then((dbFactoryChildNode) => {
+        req.app.io.emit('delete node', dbFactoryChildNode);
         res.json(dbFactoryChildNode);
       })
       .catch(err => res.json(err));
