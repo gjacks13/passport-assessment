@@ -55,15 +55,18 @@ ul > div {
 }
 
 .branch-header {
-  cursor: pointer;
   margin-top: 15px;
   margin-left: 8px;
+}
+
+.branch-expander {
+  cursor: pointer;
 }
 
 .factory-range {
   display: inline-block;
   background-color: #eeeeee;
-  margin-left: 10px;
+  margin-left: 18px;
   padding: 5px 10px;
   border-radius: 25px;
   font-size: .8em;
@@ -95,7 +98,8 @@ input {
 }
 
 .branch-name-input {
-  width: 100px;
+  width: 200px;
+  font-size: 1em;
 }
 
 .number-range {
@@ -120,10 +124,35 @@ input {
   text-align: left;
 }
 
+.node-delete {
+  vertical-align: middle;
+  display: inline-block;
+  cursor: pointer;
+  padding-bottom: 4px;
+  margin-left: 5px;
+}
+
+.node-delete:hover {
+  color: #a4a09f;
+}
+
 .grow {
   transition:all 0.4s ease-out;
 }
 
 .grow:hover {
-  transform:scale(1.2);
+  transform:scale(1.1);
+}
+
+.add-branch, .delete-factory, .generate-nodes {
+  margin-left: 10px;
+}
+
+#add-branch-div {
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.tree-list {
+  width: 50%;
 }

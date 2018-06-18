@@ -4,60 +4,146 @@ import './App.css';
 import TreeList from './components/TreeList/TreeList';
 import FactoryNode from './components/TreeList/FactoryNode';
 import FactoryChildNode from './components/TreeList/FactoryChildNode';
-
+import treeApi from './util/treeApi';
+import configSocketListeners from './util/configSocketListeners';
+import toastr from 'toastr';
 import io from 'socket.io-client';
-const socket = io('http://localhost:3001');
+import numberUtil from './util/numberUtil';
+import clientValidate from './util/clientValidate';
 
-const branches = [
-  {
-    "children": [
-      {
-        "value": 66,
-        "minValue": 1,
-        "maxValue": 25,
-        "_id": "5b27264699242e697c60e506",
-        "name": "b1factory5",
-        "factoryId": "5b26d5788f9cda62e8d7722c",
-        "__v": 0
-      },
-      {
-        "value": 66,
-        "minValue": 1,
-        "maxValue": 25,
-        "_id": "5b27264699242e697c60e506",
-        "name": "b1factory5",
-        "factoryId": "5b26d5788f9cda62e8d7722c",
-        "__v": 0
-      }
-    ],
-    "maxChildCount": 15,
-    "minChildValue": 1,
-    "maxChildValue": 300,
-    "_id": "5b26d5788f9cda62e8d7722c",
-    "name": "branch1",
-  },
-  {
-    "children": [
-
-      {
-        "value": 3,
-        "minValue": 1,
-        "maxValue": 25,
-        "_id": "454356",
-        "name": "b2factory5",
-        "factoryId": "35445",
-        "__v": 0
-      }
-    ],
-    "maxChildCount": 15,
-    "minChildValue": 1,
-    "maxChildValue": 300,
-    "_id": "5b26d5788f9cda62e8d7722c",
-    "name": "branch2",
-  },
-];
+// config toastr
+toastr.options.preventDuplicates = true;
 
 class App extends Component {
+  state = {
+    containerName: '',
+    containerId: '',
+    factories: [],
+    showModal: false,
+  }; // eslint-disable-line
+
+  openModal() {
+    this.setState({ showModal: true });
+  }
+
+  closeModal() {
+    this.setState({ showModal: false });
+  }
+
+  componentDidMount() {
+    this.loadState();
+
+    // set all socket event listeners
+    const socket = io('http://localhost:3001');
+    configSocketListeners(socket, this);
+  }
+
+  loadState() {
+    treeApi.getContainers()
+      .then((res) => {
+        let data = res.data;
+        if (data.length > 0) {
+          /*
+          * We're going to grab the first container here.
+          * There are no backendroutes that allow you to create containers.
+          * So, we'll only have the one container we created for this assesment.
+          * */
+          let container = data[0];
+          this.setState({
+            containerName: container.name,
+            containerId: container._id,
+            factories: container.children,
+          });
+        };
+      })
+      .catch(err => toastr.error('Failed to load tree-list. :-('));
+  }
+
+  handleFactoryNameChange(e) {
+    let newName = e.target.value;
+    const branchId = e.target.dataset['branchId'];
+    const request = {
+      name: newName
+    };
+    console.log(newName);
+    treeApi.updateFactory(this.state.containerId, branchId, request)
+      .catch(err => toastr.error('Failed to change factory name.'));
+  }
+
+  handleMinThresholdChange(e) {
+    const request = {};
+    treeApi.updateFactory()
+      .catch(err => toastr.error('Failed to change factory name.'));
+  }
+
+  handleMaxThresholdChange(request) {
+    treeApi.updateFactory(this.state.containerId, request)
+      .catch(err => toastr.error('Failed to change factory name.'));
+  }
+
+  handleAddFactoryBranch() {
+    const DEFAULT_FACTORY_NAME = 'New Factory';
+    treeApi.addFactory(this.state.containerId, DEFAULT_FACTORY_NAME)
+      .catch(err => toastr.error('Failed to add factory.'));
+  }
+
+  handleGenerateFactoryNodes(e) {
+    const factoryId = e.target.dataset['branchId'];
+    const factoryIndex = this.state.factories.findIndex(factory => factory._id === factoryId);
+    if (factoryIndex !== -1) {
+      const factory = this.state.factories[factoryIndex];
+
+      // grab max value, min value, and total node values from the dom
+      const minValue = factory.minChildValue;
+      const maxValue = factory.maxChildValue;
+      const totalNodes = 3;
+
+      // check to see if the ranges are valid
+      let errorMsg;
+      if (errorMsg = clientValidate.validateNodeValueRange(minValue, maxValue)) {
+        toastr.error(errorMsg);
+        return;
+      }
+
+      const factoryChildLimit = factory.maxChildCount;
+      const nodeValues = numberUtil.getRandomIntegers(minValue, maxValue, totalNodes);
+      if (nodeValues.length > factoryChildLimit) {
+        toastr.error(`The number of nodes specified for generation should be less than ${factoryChildLimit}.`)
+        return;
+      }
+
+      // delete all node, and then add new nodes
+      treeApi.deleteNodes(this.state.containerId, factoryId)
+        .then((res) => {
+          treeApi.addNodes(this.state.containerId, factoryId, minValue, maxValue, nodeValues)
+          .catch(err => toastr.error('Failed to add factory nodes.'));
+        })
+        .catch(err => toastr.error('Failed to delete factory nodes'))
+    } else {
+      toastr.error('Failed to generate factory nodes.')
+    }
+  }
+
+  handleDeleteFactoryNodes(factoryId, nodeId) {
+    // treeApi.deleteNodes(this.state.containerId, factoryId)
+    //   .then(res => toastr.info('Successfully deleted factory nodes.'))
+    //   .catch(err => toastr.error('Failed to delete factory nodes.'));
+  }
+
+  handleDeleteFactoryBranch(e) {
+    const factoryId = e.target.dataset['branchId'];
+    treeApi.deleteFactory(this.state.containerId, factoryId)
+      .catch(err => toastr.error('Failed to delete factory.'));
+  }
+
+  toggleBranch(e) {
+    e.target.classList.toggle('fa-minus-square-o');
+    e.target.classList.toggle('fa-plus-square-o');
+    const branchId = e.target.dataset['branchId'];
+    const branchElem = document.getElementById(`branch-${branchId}`);
+    branchElem.classList.toggle('expanded');
+  }
+
   render() {
     return (
       <div className="App">
@@ -70,19 +156,27 @@ class App extends Component {
         </p>
 
         <TreeList
-          treeName="root"
+          treeName={this.state.containerName}
         >
           {
-            branches ? branches.map((branch) => (
+            this.state.factories ? this.state.factories.map((branch) => (
               <FactoryNode
+                key={branch._id}
                 branchId={branch._id}
                 branchName={branch.name}
                 minChildValue={branch.minChildValue}
                 maxChildValue={branch.maxChildValue}
+                toggleBranch={e => this.toggleBranch(e)}
+                handleNameChange={e => this.handleFactoryNameChange(e)}
+                handleDelete={e => this.handleDeleteFactoryBranch(e)}
+                handleGenerateNodes={e => this.handleGenerateFactoryNodes(e)}
               >
                 {
                   branch.children ? branch.children.map((branchChild) => (
-                    <FactoryChildNode>
+                    <FactoryChildNode
+                      key={branchChild._id}
+                      deleteNode={(e) => this.handleDeleteFactoryNode(branch._id, branchChild._id)}
+                    >
                       {branchChild.value}
                     </FactoryChildNode>
                   )) : null
@@ -92,6 +186,12 @@ class App extends Component {
               : null
           }
         </TreeList>
+        <div id="add-branch-div">
+          <button className="add-branch" onClick={() => this.handleAddFactoryBranch()}>Add Branch</button>
+        </div>
+
+        {/* <button onClick={() => this.openModal()}>Open Modal</button> */}
+
       </div>
     );
   }
