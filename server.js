@@ -5,13 +5,7 @@ const socketEvents = require('./config/socketEvents');
 const apiRoutes = require('./routes/index');
 const http = require('http');
 
-// load envrionment and config
-const env = process.env.NODE_ENV || 'development';
-//const config = require('./config/config.js');
-
-// load config variables
-//const { MONGO_URI, PORT } = config[env];
-
+// load envrionment variables
 const MONGO_URI = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3001;
 
