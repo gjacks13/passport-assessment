@@ -1,8 +1,6 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
-import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
-//ellipsis-v
+
 const FactoryNode = (props) => {
-  //{ children, branchId, branchName, minChildValue, maxChildValue, toggleBranch }
   return (
     <li className="branch">
       <div id={`branch-${props.branchId}`} className="branch-header">
