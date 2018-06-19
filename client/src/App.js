@@ -127,7 +127,7 @@ class App extends Component {
       treeApi.deleteNodes(this.state.containerId, factoryId)
         .then((res) => {
           treeApi.addNodes(this.state.containerId, factoryId, minValue, maxValue, nodeValues)
-          .catch(err => toastr.error('Failed to add factory nodes.'));
+            .catch(err => toastr.error('Failed to add factory nodes.'));
         })
         .catch(err => toastr.error('Failed to delete factory nodes'))
     } else {
@@ -155,6 +155,7 @@ class App extends Component {
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Made with React</h1>
+          <h3>By: Garvey Jackson</h3>
         </header>
         <p className="App-intro">
           The tree-list app allows you to create many factory branches, and generate a series of random numbers, within a given range, under each branch. Give it a try!
@@ -165,6 +166,11 @@ class App extends Component {
         >
           {
             this.state.factories ? this.state.factories.map((branch) => (
+              /*
+               * This component should really be broken into subcomponents
+               * for maintainability, testing, and ease of reuse.
+               * This didn't happen due to time constraints.
+               * */
               <FactoryNode
                 key={branch._id}
                 branchId={branch._id}
@@ -198,9 +204,6 @@ class App extends Component {
         <div id="add-branch-div">
           <button className="add-branch" onClick={() => this.handleAddFactoryBranch()}>Add Branch</button>
         </div>
-
-        {/* <button onClick={() => this.openModal()}>Open Modal</button> */}
-
       </div>
     );
   }

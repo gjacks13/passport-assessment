@@ -1,5 +1,4 @@
 import axios from 'axios';
-import numberUtil from './numberUtil';
 
 export default {
   getContainers() {
