@@ -1,0 +1,178 @@
+body {
+  font-size: 1.3em;
+}
+
+ul {
+  list-style: none;
+}
+
+ul > li {
+  margin-left: -8px;
+  margin-top: 2px;
+  padding-left: 10px;
+  padding-top: 3px;
+  border-left: 1px dotted black;
+}
+
+ul > li:before {
+  content:"";
+  position: absolute;
+  left: 80px;
+  border-bottom: 1px dotted black;
+  height: 10px;
+  width: 8px;
+}
+
+.branch {
+  border-left: 1px dotted black;
+  text-align: left;
+}
+
+.branch::before {
+  content:"";
+  position: absolute;
+  left: 32px;
+  border-bottom: 1px dotted black;
+  height: 6px;
+  width: 13px;
+  margin-top:20px;
+}
+
+.branch-header > span {
+  margin-left: 8px;
+}
+
+.branch-node {
+  padding-left: 13px;
+  margin-left: -3px
+}
+
+ul > div {
+  margin-left: -25px;
+  background-color: #a4a09f;
+  padding: 6px 10px;
+  color: white;
+}
+
+.branch-header {
+  margin-top: 15px;
+  margin-left: 8px;
+}
+
+.branch-expander {
+  cursor: pointer;
+}
+
+.factory-range {
+  display: inline-block;
+  background-color: #eeeeee;
+  margin-left: 18px;
+  padding: 5px 10px;
+  border-radius: 25px;
+  font-size: .8em;
+}
+
+.branch-header:first-child {
+  margin-top: 10px;
+}
+
+.branch > ul {
+  display: none;
+}
+
+.branch > ul > li {
+  padding-top: 10px;
+}
+
+.expanded + ul {
+  display: block;
+}
+
+input {
+  outline-style: none;
+  background-color: inherit;
+  border: none;
+  overflow: hidden;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+
+.branch-name-input {
+  width: 200px;
+  font-size: 1em;
+}
+
+.number-range {
+  outline-style: none;
+  background-color: inherit;
+  border: none;
+  width: 50px;
+  overflow: hidden;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.number-range:last-child {
+  margin-left: 5px;
+}
+
+.number-range:focus {
+  outline-style: none;
+}
+
+.container-name {
+  text-align: left;
+}
+
+.node-delete {
+  vertical-align: middle;
+  display: inline-block;
+  cursor: pointer;
+  padding-bottom: 4px;
+  margin-left: 5px;
+}
+
+.node-delete:hover {
+  color: #a4a09f;
+}
+
+.grow {
+  transition:all 0.4s ease-out;
+}
+
+.grow:hover {
+  transform:scale(1.1);
+}
+
+.add-branch, .delete-factory, .generate-nodes {
+  margin-left: 10px;
+}
+
+#add-branch-div {
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.tree-list {
+  width: 85%;
+}
+
+.node-count-container {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: .8em;
+}
+
+.node-count-container > input {
+  padding: 0;
+  background-color: #eeeeee;
+  margin-left: 16px;
+  padding: 5px 10px;
+  border-radius: 25px;
+  width: 25px;
+}
+
+.multiple-icon {
+  font-size: .5em;
+  vertical-align: middle;
+}

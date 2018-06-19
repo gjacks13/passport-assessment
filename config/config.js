@@ -1,16 +1,16 @@
 const config = {
   development: {
-    mongoURI: process.env.MONGODB_URI || '',
-    port: process.env.PORT || 3001,
+    MONGO_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/tree-list',
+    PORT: process.env.PORT || 3001,
   },
   test: {
-    mongoURI: process.env.MONGODB_URI || '',
-    port: process.env.PORT || 3001,
+    MONGO_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/tree-list',
+    PORT: process.env.PORT || 3001,
   },
   production: {
-    mongoURI: process.env.MONGODB_URI || '',
-    port: process.env.PORT || 3001,
+    MONGO_URI: process.env.MONGODB_URI || 'mongodb://root:treelist1@ds261450.mlab.com:61450/heroku_lggn3tvv',
+    PORT: process.env.PORT || 3001,
   },
 };
 
-export default config;
+module.exports = config;

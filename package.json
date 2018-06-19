@@ -10,7 +10,7 @@
     "build": "node scripts/build.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "installDeps": "yarn && cd client && yarn",
-    "heroku-postbuild": "cd client && npm install && yarn run build"
+    "heroku-postbuild": "cd client && yarn install && yarn run build"
   },
   "author": "Garvey Jackson",
   "license": "ISC",
@@ -22,9 +22,15 @@
     "nodemon": "^1.17.5"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
+    "eslint-plugin-react": "^7.9.1",
     "express": "^4.16.3",
     "mongoose": "^5.1.5",
-    "react": "^16.4.1"
+    "react": "^16.4.1",
+    "socket.io": "^2.1.1"
+  },
+  "engines": {
+    "node": "10.4.0"
   }
 }
