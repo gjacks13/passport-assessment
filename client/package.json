@@ -5,16 +5,11 @@
   "proxy": "http://localhost:3001/",
   "dependencies": {
     "axios": "^0.18.0",
-    "lodash.merge": "^4.6.1",
     "react": "^16.4.1",
-    "react-bootstrap": "^0.32.1",
-    "react-contextmenu": "^2.9.2",
     "react-dom": "^16.4.1",
-    "react-modal": "^3.4.5",
     "react-scripts": "1.1.4",
     "socket.io-client": "^2.1.1",
-    "toastr": "^2.1.4",
-    "vex-js": "^4.1.0"
+    "toastr": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
