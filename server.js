@@ -6,7 +6,7 @@ const apiRoutes = require('./routes/index');
 const http = require('http');
 
 // load envrionment variables
-const MONGO_URI = process.env.MONGODB_URI;
+const MONGO_URI = 'mongodb://heroku_lggn3tvv:t5d308v22as3dosi69asr456l3@ds261450.mlab.com:61450/heroku_lggn3tvv';
 const PORT = process.env.PORT || 3001;
 
 const app = express();

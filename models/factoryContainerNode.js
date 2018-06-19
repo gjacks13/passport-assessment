@@ -18,7 +18,7 @@ const factoryContainerNodeSchema = new Schema({
     lowercase: true,
     trim: true,
     required: true,
-    maxlength: 20,
+    maxlength: 30,
   },
   children: [{
     type: Schema.Types.ObjectId,

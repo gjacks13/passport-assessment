@@ -2,7 +2,6 @@ const FactoryNode = require('../models/factoryNode');
 const FactoryChildNode = require('../models/factoryChildNode');
 const FactoryContainerNode = require('../models/factoryContainerNode');
 const Messages = require('../utils/ServerMessages');
-const NumberValidator = require('../utils/NumberValidator');
 
 module.exports = {
   getFactories(req, res) {
@@ -57,28 +56,31 @@ module.exports = {
       maxChildCount,
     } = req.body;
 
-    // validate params
-    if (children && !Array.isArray(children)) {
-      res.status(500).json(Messages.INVALID_PARAMETER_SPECIFIED);
-    }
-
     // setup filter by id
     const filter = {
       _id: factoryId,
     };
 
-    // set request data
-    if (name) request.name = name;
+    // set required params
+    request.name = name;
+
+    // do a quick range check
+    if ((minChildValue && maxChildValue) &&
+      (minChildValue >= maxChildValue)
+    ) {
+      res.status(500).json(Messages.INVALID_RANGE_SPECIFIED);
+      return;
+    }
+    if (maxChildCount && maxChildCount > 15) {
+      res.status(500).json(Messages.INVALID_CHILD_COUNT_SPECIFIED);
+      return;
+    }
+
+    // set optional request data
     if (children) request.children = children;
-    if (minChildValue && NumberValidator.isPositiveInteger(minChildValue)) {
-      request.minChildValue = minChildValue;
-    }
-    if (maxChildValue && NumberValidator.isPositiveInteger(maxChildValue)) {
-      request.maxChildValue = maxChildValue;
-    }
-    if (maxChildCount && NumberValidator.isPositiveInteger(maxChildCount)) {
-      request.maxChildCount = maxChildCount;
-    }
+    if (minChildValue) request.minChildValue = minChildValue;
+    if (maxChildValue) request.maxChildValue = maxChildValue;
+    if (maxChildCount) request.maxChildCount = maxChildCount;
 
     FactoryNode.findOneAndUpdate(filter, request, { new: true })
       .populate({
@@ -103,26 +105,30 @@ module.exports = {
       children,
       minChildValue,
       maxChildValue,
+      maxChildCount,
     } = req.body;
 
-    // validate params
-    if (children && !Array.isArray(children)) {
-      res.status(500).json(Messages.INVALID_PARAMETER_SPECIFIED);
+    // set required params
+    request.name = name;
+    request.containerId = containerId;
+
+    // do a quick range check
+    if ((minChildValue && maxChildValue) &&
+      (minChildValue >= maxChildValue)
+    ) {
+      res.status(500).json(Messages.INVALID_RANGE_SPECIFIED);
+      return;
     }
-    if (!containerId) res.status(500).json('No container id present.');
-    if (!name || name === '') res.status(500).json('No name sent in request.');
+    if (maxChildCount && maxChildCount > 15) {
+      res.status(500).json(Messages.INVALID_CHILD_COUNT_SPECIFIED);
+      return;
+    }
 
     // set optional request data
-    if (name) request.name = name;
     if (children) request.children = children;
-    if (minChildValue && NumberValidator.isPositiveInteger(minChildValue)) {
-      request.minChildValue = minChildValue;
-    }
-    if (maxChildValue && NumberValidator.isPositiveInteger(maxChildValue)) {
-      request.maxChildValue = maxChildValue;
-    }
-
-    request.containerId = containerId;
+    if (minChildValue) request.minChildValue = minChildValue;
+    if (maxChildValue) request.maxChildValue = maxChildValue;
+    if (maxChildCount) request.maxChildCount = maxChildCount;
 
     const newFactory = new FactoryNode(request);
     FactoryNode.create(newFactory)
