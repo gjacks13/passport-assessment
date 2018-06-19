@@ -5,14 +5,8 @@ const socketEvents = require('./config/socketEvents');
 const apiRoutes = require('./routes/index');
 const http = require('http');
 
-// load envrionment and config
-const env = process.env.NODE_ENV || 'development';
-//const config = require('./config/config.js');
-
-// load config variables
-//const { MONGO_URI, PORT } = config[env];
-
-const MONGO_URI = process.env.MONGODB_URI;
+// load envrionment variables
+const MONGO_URI = 'mongodb://heroku_lggn3tvv:t5d308v22as3dosi69asr456l3@ds261450.mlab.com:61450/heroku_lggn3tvv';
 const PORT = process.env.PORT || 3001;
 
 const app = express();
