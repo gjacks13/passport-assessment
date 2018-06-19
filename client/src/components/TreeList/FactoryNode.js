@@ -19,19 +19,45 @@ const FactoryNode = (props) => {
           data-branch-id={props.branchId}
         />
         <div className="factory-range grow" title="Click either number to change the min and max values for node generation.">
-          <input type="text" className="number-range" defaultValue={props.minChildValue} data-branch-id={props.branchId} />
+          <input
+            type="text"
+            className="number-range"
+            value={props.minChildValue}
+            onChange={props.handleThresholdChange}
+            data-branch-id={props.branchId}
+            data-branch-threshold-type='min'
+          />
           :
-          <input type="text" className="number-range" defaultValue={props.maxChildValue} data-branch-id={props.branchId} />
+          <input 
+            type="text" 
+            className="number-range" 
+            value={props.maxChildValue} 
+            onChange={props.handleThresholdChange}
+            data-branch-id={props.branchId}
+            data-branch-threshold-type='max'
+          />
         </div>
-        <button 
-          className="delete-factory" 
+        <div className="node-count-container">
+          <i className="fa fa-times multiple-icon" aria-hidden="true"></i>
+          <input
+            value={props.maxChildCount}
+            onChange={props.handleMaxChildChange}
+            min={1}
+            max={props.maxChildValue}
+            data-branch-id={props.branchId}
+            title="Input the total number of nodes to create."
+          />
+        </div>
+
+        <button
+          className="delete-factory"
           data-branch-id={props.branchId}
           onClick={props.handleDelete}
         >
           Delete
         </button>
-        <button className="generate-nodes" 
-          data-branch-id={props.branchId} 
+        <button className="generate-nodes"
+          data-branch-id={props.branchId}
           onClick={props.handleGenerateNodes}
         >
           Generate Nodes</button>

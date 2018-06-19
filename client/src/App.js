@@ -34,7 +34,7 @@ class App extends Component {
     this.loadState();
 
     // set all socket event listeners
-    const socket = io('http://localhost:3001');
+    const socket = io();
     configSocketListeners(socket, this);
   }
 
@@ -65,20 +65,31 @@ class App extends Component {
     const request = {
       name: newName
     };
-    console.log(newName);
     treeApi.updateFactory(this.state.containerId, branchId, request)
       .catch(err => toastr.error('Failed to change factory name.'));
   }
 
-  handleMinThresholdChange(e) {
-    const request = {};
-    treeApi.updateFactory()
+  handleMaxChildChange(e) {
+    let newMaxChildCount = e.target.value;
+    const branchId = e.target.dataset['branchId'];
+    const request = {
+      maxChildCount: newMaxChildCount
+    };
+    treeApi.updateFactory(this.state.containerId, branchId, request)
       .catch(err => toastr.error('Failed to change factory name.'));
   }
 
-  handleMaxThresholdChange(request) {
-    treeApi.updateFactory(this.state.containerId, request)
-      .catch(err => toastr.error('Failed to change factory name.'));
+  handleThresholdChange(e) {
+    let newThreshold = e.target.value;
+    const factoryId = e.target.dataset['branchId'];
+    const thresholdType = e.target.dataset['branchThresholdType'];
+    const request = {};
+
+    if (thresholdType === 'min') request.minChildValue = newThreshold;
+    if (thresholdType === 'max') request.maxChildValue = newThreshold;
+
+    treeApi.updateFactory(this.state.containerId, factoryId, request)
+      .catch(err => toastr.error('Failed to change factory threshold value.'));
   }
 
   handleAddFactoryBranch() {
@@ -96,7 +107,7 @@ class App extends Component {
       // grab max value, min value, and total node values from the dom
       const minValue = factory.minChildValue;
       const maxValue = factory.maxChildValue;
-      const totalNodes = 3;
+      const totalNodes = factory.maxChildCount;
 
       // check to see if the ranges are valid
       let errorMsg;
@@ -124,12 +135,6 @@ class App extends Component {
     }
   }
 
-  handleDeleteFactoryNodes(factoryId, nodeId) {
-    // treeApi.deleteNodes(this.state.containerId, factoryId)
-    //   .then(res => toastr.info('Successfully deleted factory nodes.'))
-    //   .catch(err => toastr.error('Failed to delete factory nodes.'));
-  }
-
   handleDeleteFactoryBranch(e) {
     const factoryId = e.target.dataset['branchId'];
     treeApi.deleteFactory(this.state.containerId, factoryId)
@@ -149,10 +154,10 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">Made with React</h1>
         </header>
         <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
+          The tree-list app allows you to create many factory branches, and generate a series of random numbers, within a given range, under each branch. Give it a try!
         </p>
 
         <TreeList
@@ -166,10 +171,14 @@ class App extends Component {
                 branchName={branch.name}
                 minChildValue={branch.minChildValue}
                 maxChildValue={branch.maxChildValue}
+                maxChildCount={branch.maxChildCount}
                 toggleBranch={e => this.toggleBranch(e)}
                 handleNameChange={e => this.handleFactoryNameChange(e)}
                 handleDelete={e => this.handleDeleteFactoryBranch(e)}
                 handleGenerateNodes={e => this.handleGenerateFactoryNodes(e)}
+                handleMaxChildChange={e => this.handleMaxChildChange(e)}
+                handleThresholdChange={e => this.handleThresholdChange(e)}
+                handleThresholdChange={e => this.handleThresholdChange(e)}
               >
                 {
                   branch.children ? branch.children.map((branchChild) => (

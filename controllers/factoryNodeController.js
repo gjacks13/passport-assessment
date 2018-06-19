@@ -1,6 +1,8 @@
 const FactoryNode = require('../models/factoryNode');
 const FactoryChildNode = require('../models/factoryChildNode');
 const FactoryContainerNode = require('../models/factoryContainerNode');
+const Messages = require('../utils/ServerMessages');
+const NumberValidator = require('../utils/NumberValidator');
 
 module.exports = {
   getFactories(req, res) {
@@ -52,7 +54,13 @@ module.exports = {
       children,
       minChildValue,
       maxChildValue,
+      maxChildCount,
     } = req.body;
+
+    // validate params
+    if (children && !Array.isArray(children)) {
+      res.status(500).json(Messages.INVALID_PARAMETER_SPECIFIED);
+    }
 
     // setup filter by id
     const filter = {
@@ -62,8 +70,15 @@ module.exports = {
     // set request data
     if (name) request.name = name;
     if (children) request.children = children;
-    if (minChildValue) request.minChildValue = minChildValue;
-    if (maxChildValue) request.maxChildValue = maxChildValue;
+    if (minChildValue && NumberValidator.isPositiveInteger(minChildValue)) {
+      request.minChildValue = minChildValue;
+    }
+    if (maxChildValue && NumberValidator.isPositiveInteger(maxChildValue)) {
+      request.maxChildValue = maxChildValue;
+    }
+    if (maxChildCount && NumberValidator.isPositiveInteger(maxChildCount)) {
+      request.maxChildCount = maxChildCount;
+    }
 
     FactoryNode.findOneAndUpdate(filter, request, { new: true })
       .populate({
@@ -90,14 +105,23 @@ module.exports = {
       maxChildValue,
     } = req.body;
 
-    // set request data
+    // validate params
+    if (children && !Array.isArray(children)) {
+      res.status(500).json(Messages.INVALID_PARAMETER_SPECIFIED);
+    }
+    if (!containerId) res.status(500).json('No container id present.');
+    if (!name || name === '') res.status(500).json('No name sent in request.');
+
+    // set optional request data
     if (name) request.name = name;
     if (children) request.children = children;
-    if (minChildValue) request.minChildValue = minChildValue;
-    if (maxChildValue) request.maxChildValue = maxChildValue;
-    if (!containerId) {
-      res.status(500).json('No factory id present');
+    if (minChildValue && NumberValidator.isPositiveInteger(minChildValue)) {
+      request.minChildValue = minChildValue;
     }
+    if (maxChildValue && NumberValidator.isPositiveInteger(maxChildValue)) {
+      request.maxChildValue = maxChildValue;
+    }
+
     request.containerId = containerId;
 
     const newFactory = new FactoryNode(request);

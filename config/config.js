@@ -8,7 +8,7 @@ const config = {
     PORT: process.env.PORT || 3001,
   },
   production: {
-    MONGO_URI: process.env.MONGODB_URI || '',
+    MONGO_URI: process.env.MONGODB_URI || 'mongodb://root:treelist1@ds261450.mlab.com:61450/heroku_lggn3tvv',
     PORT: process.env.PORT || 3001,
   },
 };
