@@ -82,17 +82,33 @@ module.exports = {
     if (maxChildValue) request.maxChildValue = maxChildValue;
     if (maxChildCount) request.maxChildCount = maxChildCount;
 
-    FactoryNode.findOneAndUpdate(filter, request, { new: true })
-      .populate({
-        path: 'children',
-        populate: {
-          path: 'children',
-          model: 'FactoryChildNode',
-        },
-      })
+    FactoryNode.findOne(filter)
       .then((dbFactoryNode) => {
-        req.app.io.emit('update factory', dbFactoryNode);
-        res.json(dbFactoryNode);
+        let rangeIsValid = true;
+        if (minChildValue) {
+          rangeIsValid = minChildValue > dbFactoryNode.maxChildValue ? false : true; // eslint-disable-line
+        }
+        if (maxChildValue) {
+          rangeIsValid = maxChildValue < dbFactoryNode.minChildValue ? false : true; // eslint-disable-line
+        }
+
+        if (rangeIsValid) {
+          FactoryNode.findOneAndUpdate(filter, request, { new: true })
+            .populate({
+              path: 'children',
+              populate: {
+                path: 'children',
+                model: 'FactoryChildNode',
+              },
+            })
+            .then((newDbFactoryNode) => {
+              req.app.io.emit('update factory', newDbFactoryNode);
+              res.json(dbFactoryNode);
+            })
+            .catch(err => res.json(err));
+        } else {
+          res.status(500).json(Messages.INVALID_RANGE_SPECIFIED);
+        }
       })
       .catch(err => res.json(err));
   },

@@ -1,7 +1,6 @@
 const FactoryChildNode = require('../models/factoryChildNode');
 const FactoryNode = require('../models/factoryNode');
 const Messages = require('../utils/ServerMessages');
-const NumberValidator = require('../utils/NumberValidator');
 
 module.exports = {
   getFactoryChildNodes(req, res) {
@@ -31,41 +30,6 @@ module.exports = {
       .catch(err => res.json(err));
   },
 
-  updateFactoryChildNode(req, res) {
-    const request = {};
-    const { nodeId } = req.params;
-    const {
-      name,
-      minValue,
-      maxValue,
-      value,
-    } = req.body;
-
-    // setup filter by id
-    const filter = {
-      _id: nodeId,
-    };
-
-    // validate params
-    // set request data
-    if (name) request.name = name;
-    if (minValue && NumberValidator.isPositiveInteger(minValue)) {
-      request.minValue = minValue;
-    }
-    if (maxValue && NumberValidator.isPositiveInteger(maxValue)) {
-      request.maxValue = maxValue;
-    }
-    if (value && NumberValidator.isPositiveInteger(value)) {
-      request.value = value;
-    }
-    FactoryChildNode.findOneAndUpdate(filter, request, { new: true })
-      .then((dbFactoryChildNode) => {
-        req.app.io.emit('update node', dbFactoryChildNode);
-        res.json(dbFactoryChildNode);
-      })
-      .catch(err => res.json(err));
-  },
-
   createFactoryChildNodes(req, res) {
     const request = {};
     const {
@@ -77,26 +41,24 @@ module.exports = {
 
     const { factoryId } = req.params;
 
-    // validate params
-    if (!Array.isArray(nodeValues)) {
-      res.status(500).json(Messages.INVALID_PARAMETER_SPECIFIED);
-    }
-
-    // set request data
-    if (name) request.name = name;
-    if (minChildValue && NumberValidator.isPositiveInteger(minChildValue)) {
-      request.minChildValue = minChildValue;
-    }
-    if (maxChildValue && NumberValidator.isPositiveInteger(maxChildValue)) {
-      request.maxChildValue = maxChildValue;
-    }
-    if (!nodeValues) {
-      res.status(500).json('No node values specified.');
-    }
-
     if (!factoryId) {
       res.status(500).json('No factory id present');
     }
+
+    // do a quick range check
+    if ((minChildValue && maxChildValue) &&
+      (minChildValue >= maxChildValue)
+    ) {
+      res.status(500).json(Messages.INVALID_RANGE_SPECIFIED);
+      return;
+    }
+
+    // set optional request data
+    if (name) request.name = name;
+    if (minChildValue) request.minChildValue = minChildValue;
+    if (maxChildValue) request.maxChildValue = maxChildValue;
+
+    // set required data
     request.factoryId = factoryId;
 
     // filter and make sure what we send to the server is nothing but an array of integers

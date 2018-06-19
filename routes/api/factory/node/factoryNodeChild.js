@@ -6,8 +6,8 @@ router.route('/')
   .get(factoryChildNodeController.getFactoryChildNodes)
   .post([
     check('name').optional().trim().escape(),
-    check('minChildValue').optional().isInt().toInt(),
-    check('maxChildValue').optional().isInt().toInt(),
+    check('minChildValue').optional().isInt({ gt: 0 }).toInt(),
+    check('maxChildValue').optional().isInt({ gt: 0 }).toInt(),
     check('nodeValues').isArray(),
   ], (req, res) => {
     const errors = validationResult(req);
@@ -19,9 +19,3 @@ router.route('/')
   .delete(factoryChildNodeController.deleteFactoryChildNodes);
 
 module.exports = router;
-
-
-// name,
-// minChildValue,
-// maxChildValue,
-// nodeValues,
